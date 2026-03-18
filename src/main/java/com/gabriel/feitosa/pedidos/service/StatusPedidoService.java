@@ -1,5 +1,6 @@
 package com.gabriel.feitosa.pedidos.service;
 
+import com.gabriel.feitosa.pedidos.exception.PedidoNotFoundException;
 import com.gabriel.feitosa.pedidos.model.StatusEnum;
 import com.gabriel.feitosa.pedidos.model.StatusPedido;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,7 @@ public class StatusPedidoService {
         StatusPedido statusPedido = statusMap.get(idPedido);
 
         if (statusPedido == null) {
-            throw new RuntimeException("Pedido não encontrado para o id: " + idPedido);
+            throw new PedidoNotFoundException("Pedido não encontrado para o id: " + idPedido);
         }
 
         return statusPedido;
