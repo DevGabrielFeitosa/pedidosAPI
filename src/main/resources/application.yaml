@@ -1,3 +1,24 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: pedidos
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+app:
+  rabbit:
+    exchange: pedidos.exchange.gabriel
+    dlx: pedidos.dlx.gabriel
+    queue-entrada: pedidos.entrada.gabriel
+    queue-dlq: pedidos.entrada.gabriel.dlq
+    queue-status-sucesso: pedidos.status.sucesso.gabriel
+    queue-status-falha: pedidos.status.falha.gabriel
+    routing-entrada: pedidos.entrada
+    routing-status-sucesso: pedidos.status.sucesso
+    routing-status-falha: pedidos.status.falha
+    routing-dlq: pedidos.entrada.dlq
