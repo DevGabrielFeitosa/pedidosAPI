@@ -25,9 +25,17 @@ public class StatusPedidoService {
     }
 
     public void atualizarParaProcessando(UUID idPedido) {
-        StatusPedido atual = buscarPorId(idPedido);
+        StatusPedido atual = statusMap.get(idPedido);
 
-        atual.setStatus(StatusEnum.PROCESSANDO);
+        if (atual == null) {
+            atual = StatusPedido.builder()
+                    .idPedido(idPedido)
+                    .status(StatusEnum.PROCESSANDO)
+                    .build();
+        } else {
+            atual.setStatus(StatusEnum.PROCESSANDO);
+        }
+
         statusMap.put(idPedido, atual);
     }
 
