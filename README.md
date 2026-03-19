@@ -1,6 +1,6 @@
-# Sistema de Pedidos Assíncrono - Backend
+# Sistema de Pedidos Assíncrono
 
-Backend do desafio técnico para processamento assíncrono de pedidos com **Spring Boot** e **RabbitMQ**.
+Projeto do desafio técnico com **backend Spring Boot** e **cliente desktop em Java Swing** para processamento assíncrono de pedidos com **RabbitMQ**.
 
 A aplicação recebe pedidos via HTTP, coloca a mensagem em uma fila RabbitMQ e faz o processamento de forma assíncrona. Durante o processamento, o status do pedido é mantido em memória e pode ser consultado por endpoint.
 
@@ -100,7 +100,7 @@ Painel do RabbitMQ:
 
 - `http://localhost:15672`
 
-### 2. Rodar a aplicação
+### 2. Rodar o backend
 
 No diretório do projeto:
 
@@ -113,6 +113,32 @@ No Windows:
 ```bash
 .\mvnw.cmd spring-boot:run
 ```
+
+### 3. Rodar a aplicação desktop Swing
+
+A aplicação desktop está no pacote:
+
+- `com.gabriel.feitosa.pedidos.desktop`
+
+Classe principal:
+
+- `com.gabriel.feitosa.pedidos.desktop.PedidoDesktopApplication`
+
+O jeito mais simples de executar é pela IDE, rodando essa classe `main`.
+
+Se quiser apontar o desktop para outra URL do backend, use uma das opções abaixo:
+
+- VM option:
+  - `-Dpedidos.backend.url=http://localhost:8080`
+- variável de ambiente:
+  - `PEDIDOS_BACKEND_URL=http://localhost:8080`
+
+Fluxo esperado para demonstração:
+
+1. subir o backend
+2. abrir a aplicação Swing
+3. enviar um pedido pela interface
+4. acompanhar a mudança de status na tabela até `SUCESSO` ou `FALHA`
 
 ## Rodando os testes
 
@@ -130,7 +156,7 @@ No Windows:
 
 - O status dos pedidos é mantido em memória, sem banco de dados.
 - A DLQ foi configurada para demonstrar o tratamento de falhas no consumo.
-- O projeto está focado no backend do desafio. A parte desktop Swing pode consumir os endpoints normalmente.
+- A interface Swing envia pedidos por HTTP e faz polling assíncrono de status sem bloquear a UI.
 
 ## Melhorias que poderiam ser feitas
 
