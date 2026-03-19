@@ -12,8 +12,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
+    @ExceptionHandler(PedidoNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(PedidoNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("erro", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
@@ -27,5 +27,13 @@ public class GlobalExceptionHandler {
                 ? ex.getBindingResult().getFieldError().getDefaultMessage()
                 : "Erro de validação");
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleUnexpected(Exception ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("erro", "Erro interno no servidor");
+        body.put("detalhe", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

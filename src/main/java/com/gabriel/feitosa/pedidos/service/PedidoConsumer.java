@@ -1,6 +1,7 @@
 package com.gabriel.feitosa.pedidos.service;
 
 
+import com.gabriel.feitosa.pedidos.exception.ProcessamentoPedidoException;
 import com.gabriel.feitosa.pedidos.model.Pedido;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,34 +27,36 @@ public class PedidoConsumer {
         log.info("Iniciando processamento do pedido id={}", pedido.getId());
 
         try {
-            // Atualiza status
             statusPedidoService.atualizarParaProcessando(pedido.getId());
 
-            // Simula processamento (1 a 3 segundos)
-            int tempo = 1000 + random.nextInt(2000);
+            int tempo = 1000 + random.nextInt(2001);
             Thread.sleep(tempo);
 
-            // 20% chance de falha
             if (random.nextDouble() < 0.2) {
-                throw new RuntimeException("Erro simulado no processamento");
+                throw new ProcessamentoPedidoException("Erro simulado no processamento");
             }
 
-            // Sucesso
             statusPedidoService.atualizarParaSucesso(pedido.getId());
-
             statusPublisher.publicarSucesso(pedido.getId());
 
             log.info("Pedido processado com SUCESSO id={}", pedido.getId());
 
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            tratarFalha(pedido, new ProcessamentoPedidoException("Processamento interrompido", e));
+
+        } catch (ProcessamentoPedidoException e) {
+            tratarFalha(pedido, e);
+
         } catch (Exception e) {
-
-            log.error("Erro ao processar pedido id={}", pedido.getId(), e);
-
-            statusPedidoService.atualizarParaFalha(pedido.getId(), e.getMessage());
-
-            statusPublisher.publicarFalha(pedido.getId(), e.getMessage());
-
-            throw new AmqpRejectAndDontRequeueException(e.getMessage());
+            tratarFalha(pedido, new ProcessamentoPedidoException("Erro inesperado no processamento", e));
         }
+    }
+
+    private void tratarFalha(Pedido pedido, ProcessamentoPedidoException e) {
+        log.error("Erro ao processar pedido id={}", pedido.getId(), e);
+        statusPedidoService.atualizarParaFalha(pedido.getId(), e.getMessage());
+        statusPublisher.publicarFalha(pedido.getId(), e.getMessage());
+        throw new AmqpRejectAndDontRequeueException(e.getMessage(), e);
     }
 }
