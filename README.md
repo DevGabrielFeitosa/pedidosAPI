@@ -79,15 +79,53 @@ Resposta esperada:
 
 ## Como rodar o projeto
 
-### 1. Subir um RabbitMQ local
+### 1. Configurar o RabbitMQ
 
-Se quiser rodar localmente com Docker:
+No contexto do desafio, foi disponibilizado um servidor RabbitMQ já acessível para avaliação.
+
+O projeto fica com configuração local por padrão, mas aceita sobrescrita por variáveis de ambiente:
+
+- `RABBITMQ_HOST`
+- `RABBITMQ_PORT`
+- `RABBITMQ_USERNAME`
+- `RABBITMQ_PASSWORD`
+
+Se o avaliador quiser subir a aplicação usando o broker disponibilizado no desafio, basta definir essas variáveis antes de iniciar o backend.
+
+Exemplo no Windows PowerShell:
+
+```powershell
+$env:RABBITMQ_HOST="jaragua-01.lmq.cloudamqp.com"
+$env:RABBITMQ_PORT="5672"
+$env:RABBITMQ_USERNAME="<usuario>"
+$env:RABBITMQ_PASSWORD="<senha>"
+.\mvnw.cmd spring-boot:run
+```
+
+Exemplo no Linux/macOS:
 
 ```bash
-docker run -d --hostname rabbit-local --name rabbitmq \
-  -p 5672:5672 -p 15672:15672 \
-  rabbitmq:3-management
+export RABBITMQ_HOST=jaragua-01.lmq.cloudamqp.com
+export RABBITMQ_PORT=5672
+export RABBITMQ_USERNAME=<usuario>
+export RABBITMQ_PASSWORD=<senha>
+./mvnw spring-boot:run
 ```
+
+Se preferir, os mesmos valores também podem ser configurados na IDE como variáveis de ambiente da execução.
+
+Se quiser rodar tudo localmente durante o desenvolvimento, também é possível subir apenas o RabbitMQ com Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+O arquivo `docker-compose.yml` da raiz do projeto sobe:
+
+- RabbitMQ na porta `5672`
+- painel de administração na porta `15672`
+
+Essa opção é apenas para facilitar a execução local.
 
 O projeto está configurado por padrão para usar:
 
@@ -95,6 +133,8 @@ O projeto está configurado por padrão para usar:
 - port: `5672`
 - user: `guest`
 - password: `guest`
+
+Obs: essa configuração foi feita para evitar expor o ambiente Docker fornecido para o desafio publicamente.
 
 Painel do RabbitMQ:
 
@@ -157,13 +197,4 @@ No Windows:
 - O status dos pedidos é mantido em memória, sem banco de dados.
 - A DLQ foi configurada para demonstrar o tratamento de falhas no consumo.
 - A interface Swing envia pedidos por HTTP e faz polling assíncrono de status sem bloquear a UI.
-
-## Melhorias que poderiam ser feitas
-
-- adicionar testes para controller e service
-- externalizar mais a configuração do RabbitMQ
-- persistir status em banco caso o sistema evolua
-
----
-
-Projeto desenvolvido para fins de avaliação técnica.
+- As credenciais do broker usado na avaliação não ficam fixas no repositório; a configuração pode ser informada por variáveis de ambiente.
